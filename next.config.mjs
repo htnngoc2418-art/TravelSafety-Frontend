@@ -23,7 +23,7 @@ const nextConfig = {
 
   allowedDevOrigins: [
     'https://travel-safety-backend.onrender.com/',
-    'https://TravelSafety.vercel.app',
+    'https://travel-safety-frontend.vercel.app',
       'http://localhost:3000', // Port 3000 thường là mặc định của React/Next.js
       'http://127.0.0.1:3000'  ],
 }
