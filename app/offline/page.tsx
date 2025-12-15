@@ -30,7 +30,7 @@ import {
 } from "../../lib/offline-db";
 import { useToast } from "../../hooks/use-toast";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://travel-safety-backend.onrender.com/";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://travel-safety-backend.onrender.com";
 
 export default function OfflinePage() {
   const router = useRouter();

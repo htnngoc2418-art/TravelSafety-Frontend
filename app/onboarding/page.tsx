@@ -11,7 +11,7 @@ import { Label } from "../../components/ui/label"
 import { useStore } from "../../lib/store"
 import { signUp, signIn } from "../../lib/api-auth"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://travel-safety-backend.onrender.com/"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://travel-safety-backend.onrender.com"
 
 interface FormData {
   firstName: string
