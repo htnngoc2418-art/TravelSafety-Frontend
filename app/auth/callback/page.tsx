@@ -24,7 +24,7 @@ function CallbackContent() {
       setAuthToken(token)
       
       // Fetch user info from backend
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://travel-safety-backend.onrender.com/'}/api/auth/me`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://travel-safety-backend.onrender.com'}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
