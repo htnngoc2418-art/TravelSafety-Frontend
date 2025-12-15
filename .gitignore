@@ -1,0 +1,5 @@
+/node_modules
+/.env.local
+/build
+/dist
+# ... và các dòng khác như đã hướng dẫn
