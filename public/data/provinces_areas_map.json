@@ -1,0 +1,566 @@
+{
+  "Lâm Đồng": {
+    "vi": "Lâm Đồng",
+    "en": "Lam Dong",
+    "areas": {
+      "Hồ Tuyền Lâm": {
+        "vi": "Hồ Tuyền Lâm",
+        "en": "Tuyen Lam Lake"
+      },
+      "Thác Dambri": {
+        "vi": "Thác Dambri",
+        "en": "Dambri Waterfall"
+      },
+      "Bãi biển Mũi Né": {
+        "vi": "Bãi biển Mũi Né",
+        "en": "Mui Ne Beach"
+      },
+      "Tháp Chàm Phan Thiết": {
+        "vi": "Tháp Chàm Phan Thiết",
+        "en": "Phan Thiet Cham Tower"
+      },
+      "Đảo Phú Quý": {
+        "vi": "Đảo Phú Quý",
+        "en": "Phu Quy Island"
+      },
+      "Thác Trinh Nữ": {
+        "vi": "Thác Trinh Nữ",
+        "en": "Trinh Nu Waterfall"
+      }
+    }
+  },
+  "Gia Lai": {
+    "vi": "Gia Lai",
+    "en": "Gia Lai",
+    "areas": {
+      "Măng Đen": {
+        "vi": "Măng Đen",
+        "en": "Mang Den"
+      },
+      "Biển Hồ Pleiku": {
+        "vi": "Biển Hồ Pleiku",
+        "en": "T'Nung Lake"
+      },
+      "Eo Gió": {
+        "vi": "Eo Gió",
+        "en": "Eo Gio"
+      },
+      "Bãi biển Quy Nhơn": {
+        "vi": "Bãi biển Quy Nhơn",
+        "en": "Quy Nhon Beach"
+      },
+      "Chùa An Nhơn": {
+        "vi": "Chùa An Nhơn",
+        "en": "An Nhon Pagoda"
+      }
+    }
+  },
+  "Hà Nội": {
+    "vi": "Hà Nội",
+    "en": "Hanoi",
+    "areas": {
+      "Công viên Cầu Giấy": {
+        "vi": "Công viên Cầu Giấy",
+        "en": "Cau Giay Park"
+      },
+      "Khu đô thị Nam Từ Liêm": {
+        "vi": "Khu đô thị Nam Từ Liêm",
+        "en": "Nam Tu Liem Urban Area"
+      },
+      "Văn Miếu Quốc Tử Giám": {
+        "vi": "Văn Miếu Quốc Tử Giám",
+        "en": "Temple of Literature"
+      },
+      "Hồ Hoàn Kiếm": {
+        "vi": "Hồ Hoàn Kiếm",
+        "en": "Hoan Kiem Lake"
+      },
+      "Công viên Thanh Xuân": {
+        "vi": "Công viên Thanh Xuân",
+        "en": "Thanh Xuan Park"
+      },
+      "Lăng Chủ tịch Hồ Chí Minh": {
+        "vi": "Lăng Chủ tịch Hồ Chí Minh",
+        "en": "Ho Chi Minh Mausoleum"
+      },
+      "Núi Ba Vì": {
+        "vi": "Núi Ba Vì",
+        "en": "Ba Vi Mountain"
+      },
+      "Núi Sóc Sơn": {
+        "vi": "Núi Sóc Sơn",
+        "en": "Soc Son Mountain"
+      },
+      "Chùa Thạch Thất": {
+        "vi": "Chùa Thạch Thất",
+        "en": "Thach That Pagoda"
+      },
+      "Phố cổ Hà Đông": {
+        "vi": "Phố cổ Hà Đông",
+        "en": "Ha Dong Old Quarter"
+      },
+      "Chùa Trấn Quốc": {
+        "vi": "Chùa Trấn Quốc",
+        "en": "Tran Quoc Pagoda"
+      }
+    }
+  },
+  "Hà Tĩnh": {
+    "vi": "Hà Tĩnh",
+    "en": "Ha Tinh",
+    "areas": {
+      "Biển Thiên Cầm": {
+        "vi": "Biển Thiên Cầm",
+        "en": "Thien Cam Beach"
+      }
+    }
+  },
+  "Tuyên Quang": {
+    "vi": "Tuyên Quang",
+    "en": "Tuyen Quang",
+    "areas": {
+      "Công viên địa chất Đồng Văn": {
+        "vi": "Công viên địa chất Đồng Văn",
+        "en": "Dong Van Geopark"
+      },
+      "Đèo Mã Pì Lèng": {
+        "vi": "Đèo Mã Pì Lèng",
+        "en": "Ma Pi Leng Pass"
+      }
+    }
+  },
+  "An Giang": {
+    "vi": "An Giang",
+    "en": "An Giang",
+    "areas": {
+      "Chợ đêm Phú Quốc": {
+        "vi": "Chợ đêm Phú Quốc",
+        "en": "Phu Quoc Night Market"
+      },
+      "Biển Hà Tiên": {
+        "vi": "Biển Hà Tiên",
+        "en": "Ha Tien Beach"
+      },
+      "Chợ Rạch Giá": {
+        "vi": "Chợ Rạch Giá",
+        "en": "Rach Gia Market"
+      },
+      "Núi Sam": {
+        "vi": "Núi Sam",
+        "en": "Sam Mountain"
+      }
+    }
+  },
+  "Cần Thơ": {
+    "vi": "Cần Thơ",
+    "en": "Can Tho",
+    "areas": {
+      "Chợ Vị Thanh": {
+        "vi": "Chợ Vị Thanh",
+        "en": "Vi Thanh Market"
+      },
+      "Chợ nổi Cái Răng": {
+        "vi": "Chợ nổi Cái Răng",
+        "en": "Cai Rang Floating Market"
+      },
+      "Bến Ninh Kiều": {
+        "vi": "Bến Ninh Kiều",
+        "en": "Ninh Kieu Wharf"
+      },
+      "Bãi biển Mỹ Thanh": {
+        "vi": "Bãi biển Mỹ Thanh",
+        "en": "My Thanh Beach"
+      },
+      "Chùa Khmer Sóc Trăng": {
+        "vi": "Chùa Khmer Sóc Trăng",
+        "en": "Khmer Pagoda Soc Trang"
+      }
+    }
+  },
+  "Đắk Lắk": {
+    "vi": "Đắk Lắk",
+    "en": "Dak Lak",
+    "areas": {
+      "Hồ Lắk": {
+        "vi": "Hồ Lắk",
+        "en": "Lak Lake"
+      },
+      "Đập Phú Hiệp": {
+        "vi": "Đập Phú Hiệp",
+        "en": "Phu Hiep Dam"
+      },
+      "Mũi Điện": {
+        "vi": "Mũi Điện",
+        "en": "Mui Dien"
+      }
+    }
+  },
+  "Thành phố Hồ Chí Minh": {
+    "vi": "Thành phố Hồ Chí Minh",
+    "en": "Ho Chi Minh City",
+    "areas": {
+      "Công viên Văn hóa Suối Tiên": {
+        "vi": "Công viên Văn hóa Suối Tiên",
+        "en": "Suoi Tien Cultural Park"
+      },
+      "Khu du lịch Nhà Bè": {
+        "vi": "Khu du lịch Nhà Bè",
+        "en": "Nha Be Tourist Area"
+      },
+      "Quần đảo Côn Đảo": {
+        "vi": "Quần đảo Côn Đảo",
+        "en": "Con Dao Islands"
+      },
+      "Khu công nghiệp Vĩnh Lộc": {
+        "vi": "Khu công nghiệp Vĩnh Lộc",
+        "en": "Vinh Loc Industrial Park"
+      },
+      "Bảo tàng Chứng tích Chiến tranh": {
+        "vi": "Bảo tàng Chứng tích Chiến tranh",
+        "en": "War Remnants Museum"
+      },
+      "Hồ Đức Hòa": {
+        "vi": "Hồ Đức Hòa",
+        "en": "Duc Hoa Lake"
+      },
+      "Khu công nghiệp Dĩ An": {
+        "vi": "Khu công nghiệp Dĩ An",
+        "en": "Di An Industrial Park"
+      },
+      "Chợ Hóc Môn": {
+        "vi": "Chợ Hóc Môn",
+        "en": "Hoc Mon Market"
+      },
+      "Bãi Trước": {
+        "vi": "Bãi Trước",
+        "en": "Bai Truoc Beach"
+      },
+      "Đại học Quốc gia": {
+        "vi": "Đại học Quốc gia",
+        "en": "Vietnam National University"
+      },
+      "Chợ Bến Thành": {
+        "vi": "Chợ Bến Thành",
+        "en": "Ben Thanh Market"
+      },
+      "Địa đạo Củ Chi": {
+        "vi": "Địa đạo Củ Chi",
+        "en": "Cu Chi Tunnels"
+      },
+      "Chùa Bửu Long": {
+        "vi": "Chùa Bửu Long",
+        "en": "Buu Long Pagoda"
+      },
+      "Lăng Ông Bà Chiểu": {
+        "vi": "Lăng Ông Bà Chiểu",
+        "en": "Ba Chieu Tomb"
+      },
+      "Khu đô thị Phú Mỹ Hưng": {
+        "vi": "Khu đô thị Phú Mỹ Hưng",
+        "en": "Phu My Hung Urban Area"
+      },
+      "Sân bay Tân Sơn Nhất": {
+        "vi": "Sân bay Tân Sơn Nhất",
+        "en": "Tan Son Nhat Airport"
+      },
+      "Rừng ngập mặn Cần Giờ": {
+        "vi": "Rừng ngập mặn Cần Giờ",
+        "en": "Can Gio Mangrove Forest"
+      }
+    }
+  },
+  "Đà Nẵng": {
+    "vi": "Đà Nẵng",
+    "en": "Da Nang",
+    "areas": {
+      "Cầu Rồng": {
+        "vi": "Cầu Rồng",
+        "en": "Dragon Bridge"
+      },
+      "Bãi biển Mỹ Khê": {
+        "vi": "Bãi biển Mỹ Khê",
+        "en": "My Khe Beach"
+      },
+      "Ngũ Hành Sơn": {
+        "vi": "Ngũ Hành Sơn",
+        "en": "Marble Mountains"
+      },
+      "Đảo Cù Lao Chàm": {
+        "vi": "Đảo Cù Lao Chàm",
+        "en": "Cham Island"
+      },
+      "Thành cổ Tam Kỳ": {
+        "vi": "Thành cổ Tam Kỳ",
+        "en": "Tam Ky Citadel"
+      },
+      "Phố cổ Hội An": {
+        "vi": "Phố cổ Hội An",
+        "en": "Hoi An Ancient Town"
+      },
+      "Bà Nà Hills": {
+        "vi": "Bà Nà Hills",
+        "en": "Ba Na Hills"
+      },
+      "Bán đảo Sơn Trà": {
+        "vi": "Bán đảo Sơn Trà",
+        "en": "Son Tra Peninsula"
+      }
+    }
+  },
+  "Vĩnh Long": {
+    "vi": "Vĩnh Long",
+    "en": "Vinh Long",
+    "areas": {
+      "Chùa Ba Tri": {
+        "vi": "Chùa Ba Tri",
+        "en": "Ba Tri Pagoda"
+      },
+      "Chùa Âng": {
+        "vi": "Chùa Âng",
+        "en": "Ang Pagoda"
+      },
+      "Chợ Vĩnh Long": {
+        "vi": "Chợ Vĩnh Long",
+        "en": "Vinh Long Market"
+      },
+      "Chợ Bến Tre": {
+        "vi": "Chợ Bến Tre",
+        "en": "Ben Tre Market"
+      }
+    }
+  },
+  "Thừa Thiên Huế": {
+    "vi": "Thừa Thiên Huế",
+    "en": "Thua Thien Hue",
+    "areas": {
+      "Bãi biển Lăng Cô": {
+        "vi": "Bãi biển Lăng Cô",
+        "en": "Lang Co Beach"
+      },
+      "Đại Nội Huế": {
+        "vi": "Đại Nội Huế",
+        "en": "Hue Imperial City"
+      }
+    }
+  },
+  "Lào Cai": {
+    "vi": "Lào Cai",
+    "en": "Lao Cai",
+    "areas": {
+      "Thị trấn Sapa": {
+        "vi": "Thị trấn Sapa",
+        "en": "Sapa Town"
+      },
+      "Đỉnh Fansipan": {
+        "vi": "Đỉnh Fansipan",
+        "en": "Fansipan Peak"
+      },
+      "Chợ phiên Bắc Hà": {
+        "vi": "Chợ phiên Bắc Hà",
+        "en": "Bac Ha Market"
+      }
+    }
+  },
+  "Quảng Ninh": {
+    "vi": "Quảng Ninh",
+    "en": "Quang Ninh",
+    "areas": {
+      "Sân bay Vân Đồn": {
+        "vi": "Sân bay Vân Đồn",
+        "en": "Van Don Airport"
+      },
+      "Vịnh Hạ Long": {
+        "vi": "Vịnh Hạ Long",
+        "en": "Ha Long Bay"
+      },
+      "Đảo Cô Tô": {
+        "vi": "Đảo Cô Tô",
+        "en": "Co To Island"
+      }
+    }
+  },
+  "Ninh Bình": {
+    "vi": "Ninh Bình",
+    "en": "Ninh Binh",
+    "areas": {
+      "Quần thể Tràng An": {
+        "vi": "Quần thể Tràng An",
+        "en": "Trang An Complex"
+      }
+    }
+  },
+  "Phú Thọ": {
+    "vi": "Phú Thọ",
+    "en": "Phu Tho",
+    "areas": {
+      "Thung lũng Mai Châu": {
+        "vi": "Thung lũng Mai Châu",
+        "en": "Mai Chau Valley"
+      },
+      "Khu du lịch Tam Đảo": {
+        "vi": "Khu du lịch Tam Đảo",
+        "en": "Tam Dao Tourist Area"
+      }
+    }
+  },
+  "Tây Ninh": {
+    "vi": "Tây Ninh",
+    "en": "Tay Ninh",
+    "areas": {
+      "Thánh đường Cao Đài": {
+        "vi": "Thánh đường Cao Đài",
+        "en": "Cao Dai Holy See"
+      },
+      "Núi Bà Đen": {
+        "vi": "Núi Bà Đen",
+        "en": "Ba Den Mountain"
+      },
+      "Đền Đức Mẹ Bà Rịa": {
+        "vi": "Đền Đức Mẹ Bà Rịa",
+        "en": "Ba Ria Shrine"
+      }
+    }
+  },
+  "Sơn La": {
+    "vi": "Sơn La",
+    "en": "Son La",
+    "areas": {
+      "Cao nguyên Mộc Châu": {
+        "vi": "Cao nguyên Mộc Châu",
+        "en": "Moc Chau Plateau"
+      }
+    }
+  },
+  "Nghệ An": {
+    "vi": "Nghệ An",
+    "en": "Nghe An",
+    "areas": {
+      "Quảng trường Hồ Chí Minh Vinh": {
+        "vi": "Quảng trường Hồ Chí Minh Vinh",
+        "en": "Ho Chi Minh Square Vinh"
+      },
+      "Bãi biển Cửa Lò": {
+        "vi": "Bãi biển Cửa Lò",
+        "en": "Cua Lo Beach"
+      }
+    }
+  },
+  "Cao Bằng": {
+    "vi": "Cao Bằng",
+    "en": "Cao Bang",
+    "areas": {
+      "Thác Bản Giốc": {
+        "vi": "Thác Bản Giốc",
+        "en": "Ban Gioc Waterfall"
+      }
+    }
+  },
+  "Quảng Ngãi": {
+    "vi": "Quảng Ngãi",
+    "en": "Quang Ngai",
+    "areas": {
+      "Đảo Lý Sơn": {
+        "vi": "Đảo Lý Sơn",
+        "en": "Ly Son Island"
+      },
+      "Chùa Ông Nức": {
+        "vi": "Chùa Ông Nức",
+        "en": "Ong Nuc Pagoda"
+      }
+    }
+  },
+  "Cà Mau": {
+    "vi": "Cà Mau",
+    "en": "Ca Mau",
+    "areas": {
+      "Mũi Cà Mau": {
+        "vi": "Mũi Cà Mau",
+        "en": "Ca Mau Cape"
+      },
+      "Chùa Xiêm Cán": {
+        "vi": "Chùa Xiêm Cán",
+        "en": "Xiem Can Pagoda"
+      }
+    }
+  },
+  "Quảng Trị": {
+    "vi": "Quảng Trị",
+    "en": "Quang Tri",
+    "areas": {
+      "Thành cổ Quảng Trị": {
+        "vi": "Thành cổ Quảng Trị",
+        "en": "Quang Tri Citadel"
+      },
+      "Động Phong Nha": {
+        "vi": "Động Phong Nha",
+        "en": "Phong Nha Cave"
+      },
+      "Bãi biển Đồng Hới": {
+        "vi": "Bãi biển Đồng Hới",
+        "en": "Dong Hoi Beach"
+      }
+    }
+  },
+  "Hải Phòng": {
+    "vi": "Hải Phòng",
+    "en": "Hai Phong",
+    "areas": {
+      "Bãi biển Đồ Sơn": {
+        "vi": "Bãi biển Đồ Sơn",
+        "en": "Do Son Beach"
+      },
+      "Vườn quốc gia Cát Bà": {
+        "vi": "Vườn quốc gia Cát Bà",
+        "en": "Cat Ba National Park"
+      }
+    }
+  },
+  "Đồng Nai": {
+    "vi": "Đồng Nai",
+    "en": "Dong Nai",
+    "areas": {
+      "Sân bay Long Thành": {
+        "vi": "Sân bay Long Thành",
+        "en": "Long Thanh Airport"
+      }
+    }
+  },
+  "Đồng Tháp": {
+    "vi": "Đồng Tháp",
+    "en": "Dong Thap",
+    "areas": {
+      "Chùa Vĩnh Tràng": {
+        "vi": "Chùa Vĩnh Tràng",
+        "en": "Vinh Trang Pagoda"
+      }
+    }
+  },
+  "Khánh Hòa": {
+    "vi": "Khánh Hòa",
+    "en": "Khanh Hoa",
+    "areas": {
+      "Bãi biển Cam Ranh": {
+        "vi": "Bãi biển Cam Ranh",
+        "en": "Cam Ranh Beach"
+      },
+      "Vinpearl Land": {
+        "vi": "Vinpearl Land",
+        "en": "Vinpearl Land"
+      },
+      "Tháp Trầm Hương": {
+        "vi": "Tháp Trầm Hương",
+        "en": "Po Nagar Cham Towers"
+      }
+    }
+  },
+  "Lạng Sơn": {
+    "vi": "Lạng Sơn",
+    "en": "Lang Son",
+    "areas": {
+      "Núi Mẫu Sơn": {
+        "vi": "Núi Mẫu Sơn",
+        "en": "Mau Son Mountain"
+      }
+    }
+  }
+}
