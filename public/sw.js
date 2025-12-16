@@ -91,10 +91,13 @@ self.addEventListener("fetch", (event) => {
     }
 
     // 3. Pages & Assets - Logic Mới (Sửa lỗi crash)
+    // ... (Phần Install, Activate, Tiles, API giữ nguyên như cũ) ...
+
+    // 3. Pages & Assets - Logic đã sửa (Fix lỗi mất App khi reload/đổi tab)
     event.respondWith(
         fetch(request)
             .then((response) => {
-                // Chỉ cache những request hợp lệ (status 200)
+                // Chỉ cache những request hợp lệ
                 if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
                 }
@@ -105,22 +108,28 @@ self.addEventListener("fetch", (event) => {
                 return response;
             })
             .catch(() => {
-                // Bước 1: Tìm trong cache xem có không
+                // MẤT MẠNG: Xử lý fallback
+
+                // Bước 1: Tìm chính xác file trong cache (dành cho JS, CSS, Img đã cache)
                 return caches.match(request).then((response) => {
                     if (response) {
                         return response;
                     }
 
-                    // Bước 2: QUAN TRỌNG - Chỉ trả về trang /offline nếu đây là request điều hướng (HTML)
-                    // Kiểm tra header accept có chứa 'text/html' không
-                    if (request.headers.get("accept").includes("text/html")) {
-                        return caches.match("/offline");
+                    // Bước 2: Xử lý Navigation (HTML)
+                    // Nếu là request điều hướng trang (mode 'navigate') hoặc request lấy HTML
+                    if (request.mode === 'navigate' || request.headers.get("accept").includes("text/html")) {
+                        // QUAN TRỌNG: Thay vì trả về offline ngay, hãy trả về App Shell ("/")
+                        // Vì App của bạn cần load file gốc trước, sau đó JS mới chạy để hiện nội dung
+                        return caches.match("/").then((rootResponse) => {
+                            return rootResponse || caches.match("/offline");
+                        });
                     }
 
-                    // Nếu là ảnh/css/js mà lỗi mạng + không có cache -> Thì chịu chết (hoặc trả về ảnh placeholder)
-                    // Chứ tuyệt đối không trả về /offline
+                    // Nếu là ảnh/file khác không có trong cache -> Có thể trả về ảnh placeholder hoặc null
+                    return null;
                 });
             })
     );
 });
-console.log("[SW] Service Worker loaded");
+console.log("[SW] Service Worker loaded"); console.log("[SW] Service Worker loaded");
