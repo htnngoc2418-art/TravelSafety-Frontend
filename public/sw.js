@@ -1,131 +1,134 @@
-﻿const CACHE_NAME = "pwa-cache-v1";
-const RUNTIME_CACHE = "runtime-cache-v1";
-const PAGES_CACHE = "pages-cache-v1";
-const TILES_CACHE = "osm-tiles-v1";
+﻿const CACHE_NAME = "pwa-cache-v3"; // Đã đổi tên lên v3 để ép trình duyệt cập nhật
+const RUNTIME_CACHE = "runtime-cache-v3";
+const PAGES_CACHE = "pages-cache-v3";
+const TILES_CACHE = "osm-tiles-v3";
 
-const PRECACHE_URLS = ["/", "/offline", "/manifest.json"];
+// Danh sách file cần tải ngay lập tức. 
+// Nếu bạn có file css/js chính (ví dụ: /style.css, /script.js), hãy thêm vào mảng này.
+const PRECACHE_URLS = ["/", "/index.html", "/manifest.json"];
 
-// Install Service Worker
+// 1. INSTALL - Cài đặt
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(PRECACHE_URLS);
-      })
-      .catch((err) => {
-        console.log("[SW] Precache error:", err);
-      })
-  );
-  self.skipWaiting();
+    self.skipWaiting(); // Ép SW mới chạy ngay lập tức, không chờ user đóng tab
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    );
 });
 
-// Activate Service Worker
+// 2. ACTIVATE - Dọn dẹp cache cũ
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (
-            cacheName !== CACHE_NAME &&
-            cacheName !== RUNTIME_CACHE &&
-            cacheName !== PAGES_CACHE &&
-            cacheName !== TILES_CACHE
-          ) {
-            return caches.delete(cacheName);
-          }
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    // Xóa hết các cache cũ không phải là v3
+                    if (
+                        cacheName !== CACHE_NAME &&
+                        cacheName !== RUNTIME_CACHE &&
+                        cacheName !== PAGES_CACHE &&
+                        cacheName !== TILES_CACHE
+                    ) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
-  self.clients.claim();
+    );
+    self.clients.claim(); // Chiếm quyền điều khiển ngay lập tức
 });
 
-// Fetch handler - Network first for API, Cache first for tiles
-// ... (Phần trên giữ nguyên) ...
-
-// Fetch handler
+// 3. FETCH HANDLER - Xử lý logic mạng
 self.addEventListener("fetch", (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip non-GET requests
-    if (request.method !== "GET") {
-        return;
-    }
-
-    // 1. OSM Tiles - Cache first (Giữ nguyên logic của bạn)
+    // A. XỬ LÝ OSM TILES (Bản đồ) - Cache First
     if (url.hostname.includes("openstreetmap") || url.hostname.includes("tile")) {
         event.respondWith(
             caches.match(request).then((response) => {
-                if (response) return response;
-                return fetch(request).then((response) => {
-                    const responseToCache = response.clone();
-                    caches.open(TILES_CACHE).then((cache) => {
-                        cache.put(request, responseToCache);
-                    });
-                    return response;
-                });
-                // Tile lỗi thì kệ, không trả về /offline ở đây
+                return (
+                    response ||
+                    fetch(request).then((networkResponse) => {
+                        caches.open(TILES_CACHE).then((cache) => {
+                            cache.put(request, networkResponse.clone());
+                        });
+                        return networkResponse;
+                    })
+                );
             })
         );
         return;
     }
 
-    // 2. API calls - Network first (Giữ nguyên)
-    if (url.origin === "https://travel-safety-backend.onrender.com" || url.pathname.includes("/api")) {
+    // B. XỬ LÝ API (Backend) - Network First -> Cache -> JSON Fallback
+    // Logic: Ưu tiên lấy mới -> Nếu lỗi mạng thì lấy cache -> Nếu không có cache thì trả về JSON rỗng (để không crash App)
+    if (
+        url.origin === "https://travel-safety-backend.onrender.com" ||
+        url.pathname.includes("/api")
+    ) {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    const responseToCache = response.clone();
-                    caches.open(RUNTIME_CACHE).then((cache) => {
-                        cache.put(request, responseToCache);
-                    });
+                    const resClone = response.clone();
+                    caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, resClone));
                     return response;
                 })
                 .catch(() => {
-                    return caches.match(request); // Chỉ trả về nếu có trong cache, không fallback về offline
+                    return caches.match(request).then((cachedResponse) => {
+                        if (cachedResponse) return cachedResponse;
+
+                        // QUAN TRỌNG: Trả về JSON giả để App không bị lỗi đỏ "Failed to fetch"
+                        return new Response(
+                            JSON.stringify({ error: "No internet connection", data: [] }),
+                            {
+                                status: 503,
+                                headers: { "Content-Type": "application/json" },
+                            }
+                        );
+                    });
                 })
         );
         return;
     }
 
-    // 3. Pages & Assets - Sửa lỗi Tab mới/Reload bị chết
-    event.respondWith(
-        fetch(request)
-            .then((response) => {
-                // Chỉ cache những request thành công (200)
-                if (!response || response.status !== 200 || response.type !== 'basic') {
+    // C. XỬ LÝ HTML/NAVIGATE (SPA Routing) - Network First -> Cache -> App Shell
+    // Logic: Đây là phần sửa lỗi mở tab mới bị trắng trang/mất mạng
+    if (request.mode === "navigate" || request.headers.get("accept").includes("text/html")) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    const resClone = response.clone();
+                    caches.open(PAGES_CACHE).then((cache) => cache.put(request, resClone));
                     return response;
+                })
+                .catch(() => {
+                    // Mất mạng:
+                    return caches.match(request).then((response) => {
+                        // 1. Có cache đúng trang đó thì trả về
+                        if (response) return response;
+
+                        // 2. Không có thì trả về trang chủ (App Shell) để App tự chạy routing
+                        return caches.match("/")
+                            .then(root => root || caches.match("/index.html"))
+                            .then(finalRes => finalRes || caches.match("/offline")); // Đường cùng mới về offline
+                    });
+                })
+        );
+        return;
+    }
+
+    // D. CÁC FILE KHÁC (JS, CSS, IMG) - Stale-while-revalidate
+    // Dùng cache cũ cho nhanh, đồng thời tải ngầm cái mới để lần sau dùng
+    event.respondWith(
+        caches.match(request).then((cachedResponse) => {
+            const fetchPromise = fetch(request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200) {
+                    caches.open(PAGES_CACHE).then((cache) => cache.put(request, networkResponse.clone()));
                 }
-                const responseToCache = response.clone();
-                caches.open(PAGES_CACHE).then((cache) => {
-                    cache.put(request, responseToCache);
-                });
-                return response;
-            })
-            .catch(() => {
-                // KHI MẤT MẠNG
+                return networkResponse;
+            }).catch(err => console.log(err));
 
-                // 1. Tìm trong cache xem có file chính xác không (cho css/js/img)
-                return caches.match(request).then((response) => {
-                    if (response) {
-                        return response;
-                    }
-
-                    // 2. LOGIC QUAN TRỌNG NHẤT CHO SPA
-                    // Nếu request là điều hướng trang (HTML) -> Trả về trang chủ ("/")
-                    // Thay vì trả về /offline, ta trả về App Shell ("/") để app load được giao diện
-                    if (request.mode === 'navigate' || request.headers.get("accept").includes("text/html")) {
-                        return caches.match("/").then(rootResp => {
-                            // Nếu có trang chủ cache thì trả về, đường cùng mới trả về /offline
-                            return rootResp || caches.match("/offline");
-                        });
-                    }
-
-                    // Với ảnh/font không quan trọng thì bỏ qua
-                    return null;
-                });
-            })
+            return cachedResponse || fetchPromise;
+        })
     );
-}); console.log("[SW] Service Worker loaded");
+});
