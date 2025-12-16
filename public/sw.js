@@ -90,14 +90,11 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // 3. Pages & Assets - Logic Mới (Sửa lỗi crash)
-    // ... (Phần Install, Activate, Tiles, API giữ nguyên như cũ) ...
-
-    // 3. Pages & Assets - Logic đã sửa (Fix lỗi mất App khi reload/đổi tab)
+    // 3. Pages & Assets - Sửa lỗi Tab mới/Reload bị chết
     event.respondWith(
         fetch(request)
             .then((response) => {
-                // Chỉ cache những request hợp lệ
+                // Chỉ cache những request thành công (200)
                 if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
                 }
@@ -108,28 +105,27 @@ self.addEventListener("fetch", (event) => {
                 return response;
             })
             .catch(() => {
-                // MẤT MẠNG: Xử lý fallback
+                // KHI MẤT MẠNG
 
-                // Bước 1: Tìm chính xác file trong cache (dành cho JS, CSS, Img đã cache)
+                // 1. Tìm trong cache xem có file chính xác không (cho css/js/img)
                 return caches.match(request).then((response) => {
                     if (response) {
                         return response;
                     }
 
-                    // Bước 2: Xử lý Navigation (HTML)
-                    // Nếu là request điều hướng trang (mode 'navigate') hoặc request lấy HTML
+                    // 2. LOGIC QUAN TRỌNG NHẤT CHO SPA
+                    // Nếu request là điều hướng trang (HTML) -> Trả về trang chủ ("/")
+                    // Thay vì trả về /offline, ta trả về App Shell ("/") để app load được giao diện
                     if (request.mode === 'navigate' || request.headers.get("accept").includes("text/html")) {
-                        // QUAN TRỌNG: Thay vì trả về offline ngay, hãy trả về App Shell ("/")
-                        // Vì App của bạn cần load file gốc trước, sau đó JS mới chạy để hiện nội dung
-                        return caches.match("/").then((rootResponse) => {
-                            return rootResponse || caches.match("/offline");
+                        return caches.match("/").then(rootResp => {
+                            // Nếu có trang chủ cache thì trả về, đường cùng mới trả về /offline
+                            return rootResp || caches.match("/offline");
                         });
                     }
 
-                    // Nếu là ảnh/file khác không có trong cache -> Có thể trả về ảnh placeholder hoặc null
+                    // Với ảnh/font không quan trọng thì bỏ qua
                     return null;
                 });
             })
     );
-});
-console.log("[SW] Service Worker loaded"); console.log("[SW] Service Worker loaded");
+}); console.log("[SW] Service Worker loaded");
