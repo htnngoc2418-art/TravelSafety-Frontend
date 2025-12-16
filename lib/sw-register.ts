@@ -1,48 +1,62 @@
 "use client";
-import { useEffect } from "react";
 
-export default function ServiceWorkerRegister() {
-    useEffect(() => {
-        // 1. Chỉ chạy khi ở trình duyệt (client-side)
-        if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+// Service Worker Register
+if (typeof window !== "undefined") {
+  console.log("[SW] Checking SW support...");
 
-            const registerSW = async () => {
-                try {
-                    const registration = await navigator.serviceWorker.register("/sw.js", {
-                        scope: "/",
-                        updateViaCache: "none",
-                    });
+  if ("serviceWorker" in navigator) {
+    console.log("[SW] SW supported, waiting for page load...");
 
-                    console.log("[SW] ✅ Registered successfully:", registration.scope);
+    window.addEventListener("load", async () => {
+      console.log("[SW] Page loaded, registering SW from /sw.js");
 
-                    // Logic theo dõi update (giữ lại từ code cũ của bạn)
-                    registration.addEventListener("updatefound", () => {
-                        const newWorker = registration.installing;
-                        if (newWorker) {
-                            newWorker.addEventListener("statechange", () => {
-                                if (newWorker.state === "activated") {
-                                    console.log("[SW] ✅ New Service Worker activated!");
-                                }
-                            });
-                        }
-                    });
+      try {
+        const registration = await navigator.serviceWorker.register("/sw.js", {
+          scope: "/",
+          updateViaCache: "none",
+        });
 
-                } catch (error) {
-                    console.error("[SW] ❌ Registration failed:", error);
-                }
-            };
+        console.log("[SW] ✅ Registered successfully!", registration);
+        console.log(
+          "[SW] Current state:",
+          registration.active?.state || "no active worker"
+        );
 
-            // 2. [QUAN TRỌNG] Kiểm tra xem trang đã load xong chưa
-            // Nếu load xong rồi (readyState === complete) thì chạy luôn, không cần đợi event 'load' nữa
-            if (document.readyState === "complete") {
-                registerSW();
-            } else {
-                window.addEventListener("load", registerSW);
-                // Cleanup function
-                return () => window.removeEventListener("load", registerSW);
-            }
+        // Monitor state changes
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          console.log("[SW] 🔄 Update found, installing...");
+
+          if (newWorker) {
+            newWorker.addEventListener("statechange", () => {
+              console.log("[SW] State changed to:", newWorker.state);
+
+              if (newWorker.state === "activated") {
+                console.log("[SW] ✅ New Service Worker activated!");
+              }
+            });
+          }
+        });
+
+        // Check current active worker
+        if (registration.active) {
+          console.log(
+            "[SW] ✅ Active worker found:",
+            registration.active.state
+          );
+        } else if (registration.installing) {
+          console.log("[SW] 🔄 Worker installing...");
+        } else if (registration.waiting) {
+          console.log("[SW] ⏳ Worker waiting...");
         }
-    }, []);
-
-    return null; // Component này không hiển thị gì cả
+      } catch (error) {
+        console.error("[SW] ❌ Registration failed:", error);
+        if (error instanceof Error) {
+          console.error("[SW] Error details:", error.message);
+        }
+      }
+    });
+  } else {
+    console.warn("[SW] ⚠️ Service Workers not supported in this browser");
+  }
 }
