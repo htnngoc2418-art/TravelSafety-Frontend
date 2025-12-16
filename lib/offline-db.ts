@@ -1,4 +1,5 @@
 // frontend/lib/offline-db.ts
+import axios from 'axios'
 import { openDB, IDBPDatabase } from "idb";
 
 const DB_NAME = "safe-travel-offline";
@@ -369,49 +370,84 @@ export const getCachedTile = async (url: string) => {
 };
 
 // === EMERGENCY CONTACTS ===
-export const saveEmergencyContacts = async (contacts: any[]) => {
-  const db = await initDB();
+const API_BASE_URL = "https://your-backend-name.onrender.com/api/v1/profile";
 
-  for (const contact of contacts) {
-    await db.put("emergencyContacts", {
-      id: contact.id,
-      name: contact.name,
-      phone: contact.phone,
-      email: contact.email,
-      relation_type: contact.relation_type,
-      savedAt: Date.now(),
-    });
-  }
+// 1. SỬA LẠI HÀM LƯU LIÊN HỆ KHẨN CẤP
+export const saveEmergencyContacts = async (token: string, contacts: any[]) => {
+    try {
+        // Lặp qua danh sách và gửi từng cái lên Server
+        for (const contact of contacts) {
+            const response = await fetch(`${API_BASE_URL}/contacts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // <--- QUAN TRỌNG: Gửi Token để Server biết ai đang lưu
+                },
+                body: JSON.stringify({
+                    // Tên biến khớp với Backend Pydantic Model
+                    name: contact.name,
+                    phone: contact.phone,
+                    relation_type: contact.relation_type || "Người thân",
+                    email: contact.email || ""
+                })
+            });
+
+            if (!response.ok) {
+                const errorDetail = await response.json();
+                console.error(`❌ Lỗi lưu liên hệ ${contact.name}:`, errorDetail);
+                // Có thể throw lỗi ở đây nếu muốn dừng ngay lập tức
+            }
+        }
+        console.log("✅ Đã lưu tất cả liên hệ lên Server thành công!");
+    } catch (error) {
+        console.error("❌ Lỗi kết nối Server:", error);
+        throw error;
+    }
 };
 
-export const getEmergencyContacts = async () => {
-  const db = await initDB();
-  return await db.getAll("emergencyContacts");
-};
+// 2. SỬA LẠI HÀM LẤY LIÊN HỆ (Cần truyền thêm token)
+export const getEmergencyContacts = async (token: string) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/contacts`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // <--- QUAN TRỌNG
+            }
+        });
 
-// === SOS LOGS (Pending Sync) ===
+        if (!response.ok) {
+            throw new Error("Failed to fetch contacts");
+        }
+
+        // Trả về dữ liệu từ Server
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("❌ Không lấy được dữ liệu từ Server:", error);
+        return []; // Trả về mảng rỗng để không bị crash app
+    }
+};// 3. SỬA LẠI HÀM SOS LOGS (Gửi lên Server)
 export const saveSosLog = async (
-  latitude: number,
-  longitude: number,
-  rescueStation: string,
-  medicalNotes: string
+    latitude: number,
+    longitude: number,
+    rescueStation: string,
+    medicalNotes: string
 ) => {
-  const db = await initDB();
-  const sosId = `sos-${Date.now()}`;
-
-  await db.put("sosLogs", {
-    id: sosId,
-    latitude,
-    longitude,
-    rescueStation,
-    medicalNotes,
-    timestamp: Date.now(),
-    status: "pending",
-  });
-
-  return sosId;
+    try {
+        const response = await axios.post("https://your-backend-name.onrender.com/api/v1/sos/send", {
+            latitude,
+            longitude,
+            rescue_station: rescueStation, // Chú ý gạch dưới theo chuẩn Python
+            medical_notes: medicalNotes
+        }, {
+            withCredentials: true
+        });
+        return response.data.id;
+    } catch (error) {
+        console.error("❌ Lỗi gửi SOS:", error);
+    }
 };
-
 export const getPendingSosLogs = async () => {
   const db = await initDB();
   const logs = await db.getAll("sosLogs");
