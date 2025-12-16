@@ -3,55 +3,46 @@ import { useEffect } from "react";
 
 export default function ServiceWorkerRegister() {
     useEffect(() => {
-        // 1. Chỉ chạy trên browser (client-side)
-        if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
-            console.warn("[SW] ⚠️ Service Workers not supported or running on server");
-            return;
-        }
+        // 1. Chỉ chạy khi ở trình duyệt (client-side)
+        if (typeof window !== "undefined" && "serviceWorker" in navigator) {
 
-        // 2. Hàm đăng ký tách riêng
-        const registerSW = async () => {
-            console.log("[SW] 🚀 Starting registration...");
-            try {
-                const registration = await navigator.serviceWorker.register("/sw.js", {
-                    scope: "/",
-                    updateViaCache: "none",
-                });
+            const registerSW = async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register("/sw.js", {
+                        scope: "/",
+                        updateViaCache: "none",
+                    });
 
-                console.log("[SW] ✅ Registered successfully!", registration);
+                    console.log("[SW] ✅ Registered successfully:", registration.scope);
 
-                // --- LOGIC MONITOR CŨ CỦA BẠN (Giữ nguyên) ---
-                registration.addEventListener("updatefound", () => {
-                    const newWorker = registration.installing;
-                    console.log("[SW] 🔄 Update found, installing...");
-                    if (newWorker) {
-                        newWorker.addEventListener("statechange", () => {
-                            console.log("[SW] State changed to:", newWorker.state);
-                            if (newWorker.state === "activated") {
-                                console.log("[SW] ✅ New Service Worker activated!");
-                            }
-                        });
-                    }
-                });
-                // ---------------------------------------------
+                    // Logic theo dõi update (giữ lại từ code cũ của bạn)
+                    registration.addEventListener("updatefound", () => {
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener("statechange", () => {
+                                if (newWorker.state === "activated") {
+                                    console.log("[SW] ✅ New Service Worker activated!");
+                                }
+                            });
+                        }
+                    });
 
-            } catch (error) {
-                console.error("[SW] ❌ Registration failed:", error);
+                } catch (error) {
+                    console.error("[SW] ❌ Registration failed:", error);
+                }
+            };
+
+            // 2. [QUAN TRỌNG] Kiểm tra xem trang đã load xong chưa
+            // Nếu load xong rồi (readyState === complete) thì chạy luôn, không cần đợi event 'load' nữa
+            if (document.readyState === "complete") {
+                registerSW();
+            } else {
+                window.addEventListener("load", registerSW);
+                // Cleanup function
+                return () => window.removeEventListener("load", registerSW);
             }
-        };
-
-        // 3. LOGIC QUAN TRỌNG NHẤT (SỬA LỖI):
-        // Kiểm tra xem trang đã load xong chưa?
-        if (document.readyState === "complete") {
-            // Nếu load xong rồi -> Chạy luôn, không đợi nữa
-            registerSW();
-        } else {
-            // Nếu chưa xong -> Mới add event listener để đợi
-            window.addEventListener("load", registerSW);
-            return () => window.removeEventListener("load", registerSW); // Cleanup
         }
+    }, []);
 
-    }, []); // Chạy 1 lần duy nhất khi mount
-
-    return null; // Component này không cần render giao diện
+    return null; // Component này không hiển thị gì cả
 }
