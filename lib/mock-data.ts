@@ -77,13 +77,13 @@ export const mockEmergencyContacts: EmergencyContact[] = [
     id: '1',
     name: 'John Doe',
     phone: '+84 123 456 789',
-    relation: 'Family',
+    relation_type: 'Family',
   },
   {
     id: '2',
     name: 'Jane Smith',
     phone: '+84 987 654 321',
-    relation: 'Friend',
+    relation_type: 'Friend',
   },
 ]
 

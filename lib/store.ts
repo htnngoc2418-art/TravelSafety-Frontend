@@ -34,8 +34,7 @@ export interface EmergencyContact {
   id: string;
   name: string;
   phone: string;
-  email: string;
-  relation: string;
+  relation_type: string;
 }
 
 export interface SavedLocation {

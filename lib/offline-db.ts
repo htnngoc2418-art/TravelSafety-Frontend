@@ -29,7 +29,7 @@ interface OfflineDBSchema {
     name: string;
     phone: string;
     email: string;
-    relation: string;
+    relation_type: string;
     savedAt: number;
   };
   sosLogs: {
@@ -378,7 +378,7 @@ export const saveEmergencyContacts = async (contacts: any[]) => {
       name: contact.name,
       phone: contact.phone,
       email: contact.email,
-      relation: contact.relation,
+      relation_type: contact.relation_type,
       savedAt: Date.now(),
     });
   }
