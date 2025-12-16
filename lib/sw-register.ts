@@ -1,62 +1,57 @@
 "use client";
+import { useEffect } from "react";
 
-// Service Worker Register
-if (typeof window !== "undefined") {
-  console.log("[SW] Checking SW support...");
-
-  if ("serviceWorker" in navigator) {
-    console.log("[SW] SW supported, waiting for page load...");
-
-    window.addEventListener("load", async () => {
-      console.log("[SW] Page loaded, registering SW from /sw.js");
-
-      try {
-        const registration = await navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-          updateViaCache: "none",
-        });
-
-        console.log("[SW] ✅ Registered successfully!", registration);
-        console.log(
-          "[SW] Current state:",
-          registration.active?.state || "no active worker"
-        );
-
-        // Monitor state changes
-        registration.addEventListener("updatefound", () => {
-          const newWorker = registration.installing;
-          console.log("[SW] 🔄 Update found, installing...");
-
-          if (newWorker) {
-            newWorker.addEventListener("statechange", () => {
-              console.log("[SW] State changed to:", newWorker.state);
-
-              if (newWorker.state === "activated") {
-                console.log("[SW] ✅ New Service Worker activated!");
-              }
-            });
-          }
-        });
-
-        // Check current active worker
-        if (registration.active) {
-          console.log(
-            "[SW] ✅ Active worker found:",
-            registration.active.state
-          );
-        } else if (registration.installing) {
-          console.log("[SW] 🔄 Worker installing...");
-        } else if (registration.waiting) {
-          console.log("[SW] ⏳ Worker waiting...");
+export default function ServiceWorkerRegister() {
+    useEffect(() => {
+        // 1. Chỉ chạy trên browser (client-side)
+        if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+            console.warn("[SW] ⚠️ Service Workers not supported or running on server");
+            return;
         }
-      } catch (error) {
-        console.error("[SW] ❌ Registration failed:", error);
-        if (error instanceof Error) {
-          console.error("[SW] Error details:", error.message);
+
+        // 2. Hàm đăng ký tách riêng
+        const registerSW = async () => {
+            console.log("[SW] 🚀 Starting registration...");
+            try {
+                const registration = await navigator.serviceWorker.register("/sw.js", {
+                    scope: "/",
+                    updateViaCache: "none",
+                });
+
+                console.log("[SW] ✅ Registered successfully!", registration);
+
+                // --- LOGIC MONITOR CŨ CỦA BẠN (Giữ nguyên) ---
+                registration.addEventListener("updatefound", () => {
+                    const newWorker = registration.installing;
+                    console.log("[SW] 🔄 Update found, installing...");
+                    if (newWorker) {
+                        newWorker.addEventListener("statechange", () => {
+                            console.log("[SW] State changed to:", newWorker.state);
+                            if (newWorker.state === "activated") {
+                                console.log("[SW] ✅ New Service Worker activated!");
+                            }
+                        });
+                    }
+                });
+                // ---------------------------------------------
+
+            } catch (error) {
+                console.error("[SW] ❌ Registration failed:", error);
+            }
+        };
+
+        // 3. LOGIC QUAN TRỌNG NHẤT (SỬA LỖI):
+        // Kiểm tra xem trang đã load xong chưa?
+        if (document.readyState === "complete") {
+            // Nếu load xong rồi -> Chạy luôn, không đợi nữa
+            registerSW();
+        } else {
+            // Nếu chưa xong -> Mới add event listener để đợi
+            window.addEventListener("load", registerSW);
+            return () => window.removeEventListener("load", registerSW); // Cleanup
         }
-      }
-    });
-  } else {
-    console.warn("[SW] ⚠️ Service Workers not supported in this browser");
-  }
+
+    }, []); // Chạy 1 lần duy nhất khi mount
+
+    return null; // Component này không cần render giao diện
 }
