@@ -55,13 +55,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* [SỬA LẠI] Dùng _geist.className thay vì inter.className */}
-      <body className={`${_geist.className} antialiased`}>
-        {children}
-        
-        <GlobalRiskMonitor />
-        
-        <Analytics />
-      </body>
+          <body className={`${_geist.className} antialiased`}>
+              {children}
+              <GlobalRiskMonitor />
+              <Analytics />
+
+              <script
+                  dangerouslySetInnerHTML={{
+                      __html: `
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js')
+              .then(function (reg) {
+                console.log('[SW] Registered:', reg.scope);
+              })
+              .catch(function (err) {
+                console.error('[SW] Register failed:', err);
+              });
+          });
+        }
+      `,
+                  }}
+              />
+          </body>
     </html>
   )
 }
