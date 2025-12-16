@@ -2,305 +2,348 @@
 
 import { useState, useEffect } from "react";
 import {
-  Cloud,
-  CloudRain,
-  Wind,
-  AlertTriangle,
-  Zap,
-  Droplets,
-  AlertCircle,
-  Loader2,
+    Cloud,
+    CloudRain,
+    Wind,
+    AlertTriangle,
+    Zap,
+    Droplets,
+    AlertCircle,
+    Loader2,
+    WifiOff, // Thêm icon WifiOff
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/lib/store";
 import { useTranslation } from "@/lib/translations";
+// --- THÊM IMPORT NÀY ---
+import { saveOfflineData, getOfflineData } from "@/lib/offline-db";
 
 interface ForecastDay {
-  date: string;
-  temp_avg: number;
-  temp_min?: number | null;
-  temp_max?: number | null;
-  humidity: number | null;
-  overall_hazard: string;
-  rain_hazard: string;
-  wind_hazard: string;
-  storm_hazard: string;
-  flood_hazard: string;
-  earthquake_hazard: string;
+    date: string;
+    temp_avg: number;
+    temp_min?: number | null;
+    temp_max?: number | null;
+    humidity: number | null;
+    overall_hazard: string;
+    rain_hazard: string;
+    wind_hazard: string;
+    storm_hazard: string;
+    flood_hazard: string;
+    earthquake_hazard: string;
 }
 
 interface ForecastResponse {
-  success: boolean;
-  message: string;
-  count: number;
-  data: ForecastDay[];
-  location: {
-    latitude: number;
-    longitude: number;
-  };
+    success: boolean;
+    message: string;
+    count: number;
+    data: ForecastDay[];
+    location: {
+        latitude: number;
+        longitude: number;
+    };
 }
 
 const getDayOfWeek = (dateString: string, language: string): string => {
-  const date = new Date(dateString);
-  if (language === 'vi') {
-    const days = ["Chủ Nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-    return days[date.getDay()];
-  } else {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return days[date.getDay()];
-  }
+    const date = new Date(dateString);
+    if (language === 'vi') {
+        const days = ["Chủ Nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+        return days[date.getDay()];
+    } else {
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        return days[date.getDay()];
+    }
 };
 
 const getHazardIcon = (hazard: string) => {
-  const hazardLower = hazard.toLowerCase();
+    const hazardLower = hazard.toLowerCase();
 
-  switch (hazardLower) {
-    case "storm":
-      return <AlertTriangle className="w-6 h-6 text-red-600" />;
-    case "wind":
-      return <Wind className="w-6 h-6 text-orange-500" />;
-    case "rain":
-      return <CloudRain className="w-6 h-6 text-yellow-500" />;
-    case "flood":
-      return <Droplets className="w-6 h-6 text-blue-400" />;
-    case "no":
-      return <Cloud className="w-6 h-6 text-gray-400" />;
-    default:
-      return <Cloud className="w-6 h-6 text-gray-400" />;
-  }
+    switch (hazardLower) {
+        case "storm":
+            return <AlertTriangle className="w-6 h-6 text-red-600" />;
+        case "wind":
+            return <Wind className="w-6 h-6 text-orange-500" />;
+        case "rain":
+            return <CloudRain className="w-6 h-6 text-yellow-500" />;
+        case "flood":
+            return <Droplets className="w-6 h-6 text-blue-400" />;
+        case "no":
+            return <Cloud className="w-6 h-6 text-gray-400" />;
+        default:
+            return <Cloud className="w-6 h-6 text-gray-400" />;
+    }
 };
 
 const getHazardColor = (hazard: string): string => {
-  const hazardLower = hazard.toLowerCase();
-
-  switch (hazardLower) {
-    case "storm":
-      return "bg-red-100 border-red-300";
-    case "wind":
-      return "bg-orange-100 border-orange-300";
-    case "rain":
-      return "bg-yellow-100 border-yellow-300";
-    case "flood":
-      return "bg-blue-100 border-blue-300";
-    case "no":
-      return "bg-gray-100 border-gray-300";
-    default:
-      return "bg-gray-100 border-gray-300";
-  }
+    const hazardLower = hazard.toLowerCase();
+    switch (hazardLower) {
+        case "storm": return "bg-red-100 border-red-300";
+        case "wind": return "bg-orange-100 border-orange-300";
+        case "rain": return "bg-yellow-100 border-yellow-300";
+        case "flood": return "bg-blue-100 border-blue-300";
+        case "no": return "bg-gray-100 border-gray-300";
+        default: return "bg-gray-100 border-gray-300";
+    }
 };
 
 const getOverallHazard = (day: ForecastDay): string => {
-  // Trực tiếp lấy từ overall_hazard field
-  return day.overall_hazard;
+    return day.overall_hazard;
 };
 
 export function SevenDayForecast({ lat, lon }: { lat?: number; lon?: number }) {
-  const [forecast, setForecast] = useState<ForecastDay[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState<ForecastDay | null>(null);
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const language = useStore((state) => state.language);
-  const t = useTranslation(language);
+    const [forecast, setForecast] = useState<ForecastDay[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedDay, setSelectedDay] = useState<ForecastDay | null>(null);
+    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  useEffect(() => {
-    const fetchForecast = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Tạo URL với query parameters nếu có tọa độ
-          const url = new URL("https://travel-safety-backend.onrender.com/api/v1/forecast/");
-        if (lat !== undefined && lon !== undefined) {
-          url.searchParams.append("lat", lat.toString());
-          url.searchParams.append("lon", lon.toString());
-        }
-        
-        const response = await fetch(url.toString());
-        
-        if (!response.ok) {
-          const errorData = await response.text();
-          console.error("Error:", errorData);
-          throw new Error(`Lỗi khi lấy dữ liệu dự đoán (${response.status}): ${errorData}`);
-        }
+    // --- STATE MỚI: Check xem có đang dùng dữ liệu offline không ---
+    const [isOfflineMode, setIsOfflineMode] = useState(false);
 
-        const data: ForecastResponse = await response.json();
-        
-        if (data.success && data.data && Array.isArray(data.data)) {
-          setForecast(data.data);
-          setLocation(data.location);
-          if (data.data.length > 0) {
-            setSelectedDay(data.data[0]);
-          }
-        } else {
-          throw new Error("Định dạng dữ liệu không hợp lệ");
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Lỗi không xác định";
-        setError(errorMessage);
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const language = useStore((state) => state.language);
+    const t = useTranslation(language);
 
-    fetchForecast();
-  }, [lat, lon]);
+    useEffect(() => {
+        const fetchForecast = async () => {
+            // Key để lưu vào IndexedDB
+            const CACHE_KEY = "seven_day_forecast_cache";
 
-  if (loading) {
-    return (
-      <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 text-white">{t.sevenDayForecast}</h2>
-        <div className="flex justify-center items-center h-32">
-          <Loader2 className="w-8 h-8 animate-spin text-white" />
-        </div>
-      </div>
-    );
-  }
+            try {
+                setLoading(true);
+                setError(null);
 
-  if (error) {
-    return (
-      <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-red-500/30 shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 text-red-400">{t.forecastError}</h2>
-        <p className="text-red-300">{error}</p>
-      </div>
-    );
-  }
+                const url = new URL("https://travel-safety-backend.onrender.com/api/v1/forecast/");
+                if (lat !== undefined && lon !== undefined) {
+                    url.searchParams.append("lat", lat.toString());
+                    url.searchParams.append("lon", lon.toString());
+                }
 
-  if (forecast.length === 0) {
-    return (
-      <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 text-white">{t.sevenDayForecast}</h2>
-        <p className="text-gray-300">{t.noForecastData}</p>
-      </div>
-    );
-  }
+                // 1. Cố gắng gọi API
+                const response = await fetch(url.toString());
 
-  return (
-    <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl">
-      <h2 className="text-xl font-semibold mb-4 text-white">{t.sevenDayForecast}</h2>
-      <div>
-        {/* Thanh ngang 7 phần bằng nhau */}
-        <div className="w-full grid grid-cols-7 gap-2 mb-6">
-          {forecast.map((day, index) => {
-            const dayName = getDayOfWeek(day.date, language);
-            const overallHazard = getOverallHazard(day);
-            const isSelected = selectedDay?.date === day.date;
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
 
-            return (
-              <button
-                key={index}
-                onClick={() => setSelectedDay(day)}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer bg-white/10 backdrop-blur-sm hover:bg-white/20 ${
-                  isSelected ? "border-orange-400 shadow-lg shadow-orange-400/50" : "border-white/20"
-                }`}
-              >
-                {/* Ngày trong tuần */}
-                <span className="text-xs font-bold text-white mb-2">
-                  {dayName}
-                </span>
+                const data: ForecastResponse = await response.json();
 
-                {/* Icon hazard */}
-                <div className="flex justify-center mb-2">
-                  {getHazardIcon(overallHazard)}
+                if (data.success && data.data && Array.isArray(data.data)) {
+                    // --- THÀNH CÔNG: Cập nhật State & Lưu Cache ---
+                    setForecast(data.data);
+                    setLocation(data.location);
+                    if (data.data.length > 0) {
+                        setSelectedDay(data.data[0]);
+                    }
+                    setIsOfflineMode(false); // Đánh dấu là dữ liệu online xịn
+
+                    // Lưu vào DB Offline để dùng khi mất mạng
+                    await saveOfflineData(CACHE_KEY, {
+                        forecast: data.data,
+                        location: data.location
+                    });
+
+                } else {
+                    throw new Error("Invalid data format");
+                }
+            } catch (err) {
+                console.warn("Fetch failed, attempting to load offline cache...", err);
+
+                // --- THẤT BẠI (Mất mạng): Lấy từ Cache ---
+                try {
+                    const cached = await getOfflineData(CACHE_KEY);
+
+                    if (cached && cached.data && cached.data.forecast) {
+                        console.log("Loaded forecast from cache");
+                        setForecast(cached.data.forecast);
+                        setLocation(cached.data.location);
+                        if (cached.data.forecast.length > 0) {
+                            setSelectedDay(cached.data.forecast[0]);
+                        }
+                        setIsOfflineMode(true); // Đánh dấu đang dùng đồ cũ
+                        setError(null); // Xóa lỗi đi để hiện giao diện
+                    } else {
+                        // Không có cả cache -> Chịu chết
+                        const errorMessage = err instanceof Error ? err.message : "Connection failed & No offline data";
+                        setError(errorMessage);
+                    }
+                } catch (cacheErr) {
+                    setError("Failed to load both online and offline data");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchForecast();
+    }, [lat, lon]);
+
+    if (loading) {
+        return (
+            <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl">
+                <h2 className="text-xl font-semibold mb-4 text-white">{t.sevenDayForecast}</h2>
+                <div className="flex justify-center items-center h-32">
+                    <Loader2 className="w-8 h-8 animate-spin text-white" />
                 </div>
-
-                {/* Ngày */}
-                <span className="text-xs text-gray-200">
-                  {new Date(day.date).getDate()}
-                </span>
-
-                {/* Badge mức độ nguy hiểm */}
-                <Badge
-                  variant="outline"
-                  className="mt-2 text-xs bg-white/20 border-white/30 text-white"
-                >
-                  {overallHazard}
-                </Badge>
-
-                {/* Nhiệt độ */}
-                <span className="text-xs font-semibold text-white mt-1">
-                  {day.temp_avg.toFixed(1)}°C
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Chi tiết ngày được chọn */}
-        {selectedDay && (
-          <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
-            <h3 className="font-bold text-lg mb-4 text-white">
-              {getDayOfWeek(selectedDay.date, language)} - {selectedDay.date}
-            </h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Cột trái */}
-              <div>
-                <p className="text-sm text-gray-300">{t.temperature}</p>
-                <p className="text-xl font-bold text-white">
-                  {selectedDay.temp_min != null && selectedDay.temp_max != null
-                    ? `${selectedDay.temp_min.toFixed(1)}°C - ${selectedDay.temp_max.toFixed(1)}°C`
-                    : `${selectedDay.temp_avg.toFixed(1)}°C`}
-                </p>
-
-                {selectedDay.humidity && (
-                  <>
-                    <p className="text-sm text-gray-300 mt-3">{t.humidity}</p>
-                    <p className="text-xl font-bold text-white">
-                      {selectedDay.humidity}%
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* Cột phải - Mức độ nguy hiểm */}
-              <div>
-                <p className="text-sm font-semibold text-gray-200 mb-2">
-                  ⚠️ {t.mainHazard}
-                </p>
-                <div className="flex items-center gap-2">
-                  {getHazardIcon(selectedDay.overall_hazard)}
-                  <Badge 
-                    className="text-lg px-3 py-1 bg-white/20 border-white/30 text-white"
-                    variant="outline"
-                  >
-                    {selectedDay.overall_hazard}
-                  </Badge>
-                </div>
-                
-                {/* Chi tiết từng loại */}
-                <p className="text-xs font-semibold text-gray-300 mt-4 mb-2">{t.details}:</p>
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center justify-between text-gray-200">
-                    <span>🌧️ {t.rain}:</span>
-                    <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.rain_hazard}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-200">
-                    <span>💨 {t.wind}:</span>
-                    <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.wind_hazard}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-200">
-                    <span>⛈️ {t.storm}:</span>
-                    <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.storm_hazard}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-200">
-                    <span>🌊 {t.flood}:</span>
-                    <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.flood_hazard}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-200">
-                    <span>🌍 {t.earthquake}:</span>
-                    <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
-                      {selectedDay.earthquake_hazard}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+        );
+    }
+
+    // Chỉ hiện lỗi khi KHÔNG CÓ forecast nào (cả online lẫn offline đều tạch)
+    if (error && forecast.length === 0) {
+        return (
+            <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-red-500/30 shadow-xl">
+                <h2 className="text-xl font-semibold mb-4 text-red-400">{t.forecastError}</h2>
+                <p className="text-red-300">{error}</p>
+            </div>
+        );
+    }
+
+    if (forecast.length === 0) {
+        return (
+            <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl">
+                <h2 className="text-xl font-semibold mb-4 text-white">{t.sevenDayForecast}</h2>
+                <p className="text-gray-300">{t.noForecastData}</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-xl relative overflow-hidden">
+
+            {/* Header & Offline Badge */}
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-white">{t.sevenDayForecast}</h2>
+
+                {/* Nếu đang Offline thì hiện cái này */}
+                {isOfflineMode && (
+                    <Badge variant="outline" className="border-yellow-500 text-yellow-500 bg-yellow-500/10 gap-1 animate-pulse">
+                        <WifiOff className="w-3 h-3" />
+                        <span>Offline Mode</span>
+                    </Badge>
+                )}
+            </div>
+
+            <div>
+                {/* Thanh ngang 7 phần bằng nhau */}
+                <div className="w-full grid grid-cols-7 gap-2 mb-6 overflow-x-auto">
+                    {forecast.map((day, index) => {
+                        const dayName = getDayOfWeek(day.date, language);
+                        const overallHazard = getOverallHazard(day);
+                        const isSelected = selectedDay?.date === day.date;
+
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedDay(day)}
+                                className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer bg-white/10 backdrop-blur-sm hover:bg-white/20 min-w-[60px] ${isSelected ? "border-orange-400 shadow-lg shadow-orange-400/50" : "border-white/20"
+                                    }`}
+                            >
+                                {/* Ngày trong tuần */}
+                                <span className="text-xs font-bold text-white mb-2 text-center">
+                                    {dayName}
+                                </span>
+
+                                {/* Icon hazard */}
+                                <div className="flex justify-center mb-2">
+                                    {getHazardIcon(overallHazard)}
+                                </div>
+
+                                {/* Ngày */}
+                                <span className="text-xs text-gray-200">
+                                    {new Date(day.date).getDate()}
+                                </span>
+
+                                {/* Badge mức độ nguy hiểm */}
+                                <Badge
+                                    variant="outline"
+                                    className="mt-2 text-[10px] px-1 bg-white/20 border-white/30 text-white w-full justify-center"
+                                >
+                                    {overallHazard}
+                                </Badge>
+
+                                {/* Nhiệt độ */}
+                                <span className="text-xs font-semibold text-white mt-1">
+                                    {day.temp_avg.toFixed(1)}°C
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Chi tiết ngày được chọn */}
+                {selectedDay && (
+                    <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                        <h3 className="font-bold text-lg mb-4 text-white flex items-center gap-2">
+                            {getDayOfWeek(selectedDay.date, language)} - {selectedDay.date}
+                            {isOfflineMode && <span className="text-xs font-normal text-yellow-500 italic">(Cached Data)</span>}
+                        </h3>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Cột trái */}
+                            <div>
+                                <p className="text-sm text-gray-300">{t.temperature}</p>
+                                <p className="text-xl font-bold text-white">
+                                    {selectedDay.temp_min != null && selectedDay.temp_max != null
+                                        ? `${selectedDay.temp_min.toFixed(1)}°C - ${selectedDay.temp_max.toFixed(1)}°C`
+                                        : `${selectedDay.temp_avg.toFixed(1)}°C`}
+                                </p>
+
+                                {selectedDay.humidity && (
+                                    <>
+                                        <p className="text-sm text-gray-300 mt-3">{t.humidity}</p>
+                                        <p className="text-xl font-bold text-white">
+                                            {selectedDay.humidity}%
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Cột phải - Mức độ nguy hiểm */}
+                            <div>
+                                <p className="text-sm font-semibold text-gray-200 mb-2">
+                                    ⚠️ {t.mainHazard}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    {getHazardIcon(selectedDay.overall_hazard)}
+                                    <Badge
+                                        className="text-lg px-3 py-1 bg-white/20 border-white/30 text-white"
+                                        variant="outline"
+                                    >
+                                        {selectedDay.overall_hazard}
+                                    </Badge>
+                                </div>
+
+                                {/* Chi tiết từng loại */}
+                                <p className="text-xs font-semibold text-gray-300 mt-4 mb-2">{t.details}:</p>
+                                <div className="space-y-1 text-xs">
+                                    <div className="flex items-center justify-between text-gray-200">
+                                        <span>🌧️ {t.rain}:</span>
+                                        <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.rain_hazard}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-gray-200">
+                                        <span>💨 {t.wind}:</span>
+                                        <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.wind_hazard}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-gray-200">
+                                        <span>⛈️ {t.storm}:</span>
+                                        <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.storm_hazard}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-gray-200">
+                                        <span>🌊 {t.flood}:</span>
+                                        <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">{selectedDay.flood_hazard}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-gray-200">
+                                        <span>🌍 {t.earthquake}:</span>
+                                        <Badge variant="outline" className="text-xs bg-white/20 border-white/30 text-white">
+                                            {selectedDay.earthquake_hazard}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
