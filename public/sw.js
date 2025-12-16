@@ -1,121 +1,93 @@
-﻿const CACHE_NAME = "pwa-cache-v1";
+﻿const CACHE_NAME = "pwa-cache-v2";
 const RUNTIME_CACHE = "runtime-cache-v1";
 const PAGES_CACHE = "pages-cache-v1";
 const TILES_CACHE = "osm-tiles-v1";
 
-const PRECACHE_URLS = ["/", "/offline", "/manifest.json"];
+const PRECACHE_URLS = [
+    "/offline.html",
+    "/manifest.json"
+];
 
-// Install Service Worker
+// INSTALL
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(PRECACHE_URLS);
-      })
-      .catch((err) => {
-        console.log("[SW] Precache error:", err);
-      })
-  );
-  self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    );
+    self.skipWaiting();
 });
 
-// Activate Service Worker
+// ACTIVATE
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (
-            cacheName !== CACHE_NAME &&
-            cacheName !== RUNTIME_CACHE &&
-            cacheName !== PAGES_CACHE &&
-            cacheName !== TILES_CACHE
-          ) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
+    event.waitUntil(
+        caches.keys().then((names) =>
+            Promise.all(
+                names.map((n) => {
+                    if (![CACHE_NAME, RUNTIME_CACHE, PAGES_CACHE, TILES_CACHE].includes(n)) {
+                        return caches.delete(n);
+                    }
+                })
+            )
+        )
+    );
+    self.clients.claim();
 });
 
-// Fetch handler - Network first for API, Cache first for tiles
+// FETCH
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
+    const request = event.request;
+    const url = new URL(request.url);
 
-  // Skip non-GET requests
-  if (request.method !== "GET") {
-    return;
-  }
+    if (request.method !== "GET") return;
 
-  // OSM Tiles - Cache first
-  if (url.hostname.includes("openstreetmap") || url.hostname.includes("tile")) {
-    event.respondWith(
-      caches.match(request).then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(request)
-          .then((response) => {
-            const responseToCache = response.clone();
-            caches.open(TILES_CACHE).then((cache) => {
-              cache.put(request, responseToCache);
-            });
-            return response;
-          })
-          .catch(() => {
-            return caches.match("/offline");
-          });
-      })
-    );
-    return;
-  }
+    // ⭐ CÁCH 2: HTML navigation (QUAN TRỌNG NHẤT)
+    if (request.mode === "navigate") {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    const copy = response.clone();
+                    caches.open(PAGES_CACHE).then((cache) => {
+                        cache.put(request.url, copy);
+                    });
+                    return response;
+                })
+                .catch(() =>
+                    caches.open(PAGES_CACHE)
+                        .then((cache) => cache.match(request.url))
+                        .then((cached) => cached || caches.match("/offline.html"))
+                )
+        );
+        return;
+    }
 
-  // API calls - Network first
-    if (url.origin === "https://travel-safety-backend.onrender.com" || url.pathname.includes("/api")) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const responseToCache = response.clone();
-          caches.open(RUNTIME_CACHE).then((cache) => {
-            cache.put(request, responseToCache);
-          });
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request).then((response) => {
-            if (response) {
-              return response;
-            }
-            return caches.match("/offline");
-          });
-        })
-    );
-    return;
-  }
+    // OSM tiles – cache first
+    if (url.hostname.includes("openstreetmap") || url.hostname.includes("tile")) {
+        event.respondWith(
+            caches.match(request).then((res) => {
+                if (res) return res;
+                return fetch(request).then((netRes) => {
+                    caches.open(TILES_CACHE).then((c) => c.put(request, netRes.clone()));
+                    return netRes;
+                });
+            })
+        );
+        return;
+    }
 
-  // Pages - Network first
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        const responseToCache = response.clone();
-        caches.open(PAGES_CACHE).then((cache) => {
-          cache.put(request, responseToCache);
-        });
-        return response;
-      })
-      .catch(() => {
-        return caches.match(request).then((response) => {
-          if (response) {
-            return response;
-          }
-          return caches.match("/offline");
-        });
-      })
-  );
+    // API – network first
+    if (
+        url.origin === "https://travel-safety-backend.onrender.com" ||
+        url.pathname.startsWith("/api")
+    ) {
+        event.respondWith(
+            fetch(request)
+                .then((res) => {
+                    caches.open(RUNTIME_CACHE).then((c) => c.put(request, res.clone()));
+                    return res;
+                })
+                .catch(() => caches.match(request))
+        );
+        return;
+    }
 });
 
-console.log("[SW] Service Worker loaded");
+console.log("[SW] Service Worker loaded (CACH 2)");
