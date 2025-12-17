@@ -1,0 +1,24 @@
+{
+  "5vmh9F7MrMZDunyY30VRTa4k4i0DJ8ksxBmr1NbIUzA": {
+    "user": {
+      "user_id": "1",
+      "email": "nguyenhaitrong15@gmail.com",
+      "first_name": "Nguy\u1ec5n H\u1ea3i",
+      "last_name": "Tr\u1ecdng",
+      "phone_number": "",
+      "created_at": "2025-11-29T15:28:18.769532"
+    },
+    "expires_at": "2025-12-05T09:33:23.290970"
+  },
+  "xuEG1iax7QUsXJycKjrQ7u3k3S3ZgnS4Qv8-bPLR84M": {
+    "user": {
+      "user_id": 2,
+      "email": "kiiqq1402@gmail.com",
+      "first_name": "Ki",
+      "last_name": "Kiiqie",
+      "phone_number": "",
+      "created_at": "2025-12-12T12:16:26.510294"
+    },
+    "expires_at": "2025-12-13T12:16:26.510294"
+  }
+}

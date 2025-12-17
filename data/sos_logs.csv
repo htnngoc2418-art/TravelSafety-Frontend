@@ -1,0 +1,9 @@
+timestamp,user_id,lat,long,medical_info,contact_email,dispatched_to,distance_km
+2025-12-10T13:40:19.339375,1,11.009611857189675,106.66755402564523,No information,Not provided,Unknown,0.91
+2025-12-10T13:44:58.035214,1,11.009625728735944,106.66755328155602,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T13:46:58.616585,1,11.009612877269518,106.66755714338872,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T13:50:18.734134,1,11.009623649614118,106.66753606357454,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T13:53:50.315511,1,11.009603032251416,106.66755561406491,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T13:55:19.664322,1,11.009598954006448,106.66753538015519,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T14:00:14.154764,1,11.009604208891117,106.66753953225,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
+2025-12-10T14:01:19.184992,1,11.009579912773505,106.66754069786123,No information,['nguoibinhthuong375@gmail.com'],Unknown,0.91
